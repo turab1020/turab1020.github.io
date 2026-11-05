@@ -1,326 +1,573 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Internet Paradox: A Blessing or a Curse?</title>
-  <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #121c33;
-      --ink: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --good: #34d399;
-      --bad: #f87171;
-      --warn: #fbbf24;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
-      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Internet Paradox: A Blessing or a Curse?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --y: #ffc000;
+    --y2: #f5b400;
+    --dark: #3a3a3a;
+    --bg: #f6f6f6;
+    --soft: #ececec;
+    --ink: #111;
+    --muted: #5b5b5b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #d9d9d9; overflow: hidden;
+    font-family: "Lato", "Helvetica Neue", Arial, sans-serif; color: var(--ink); }
 
-    .deck { position: relative; width: 100vw; height: 100vh; }
-    .slide {
-      position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
-      padding: 6vh 8vw; overflow-y: auto;
-      background: radial-gradient(circle at 85% 0%, rgba(56,189,248,.15), transparent 40%), var(--bg);
-    }
-    .slide.active { display: flex; animation: fade .4s ease; }
-    @keyframes fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+    transform: translate(-50%, -50%) scale(var(--s, 1)); }
+  .slide { position: absolute; inset: 0; background: var(--bg); overflow: hidden; display: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+  .slide.active { display: block; animation: in .45s ease; }
+  @keyframes in { from { opacity: 0; } to { opacity: 1; } }
 
-    h1 { font-size: clamp(2.2rem, 5.5vw, 4.4rem); margin: 0 0 .4em; line-height: 1.1; }
-    h2 { font-size: clamp(1.8rem, 3.8vw, 2.9rem); margin: 0 0 .6em; color: var(--accent); }
-    h3 { font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin: .2em 0 .4em; }
-    p, li { font-size: clamp(1.1rem, 2.1vw, 1.6rem); line-height: 1.5; }
-    ul { margin: 0; padding-left: 1.2em; }
-    li { margin-bottom: .55em; }
-    .sub { color: var(--muted); font-size: clamp(1.1rem, 2vw, 1.5rem); }
+  .abs { position: absolute; }
+  .circ { position: absolute; border-radius: 50%; }
+  .ring { position: absolute; border-radius: 50%; border: 40px solid var(--y); }
+  .ov { font-size: 21px; font-weight: 400; color: #222; margin: 0 0 4px; }
+  .t { font-size: 56px; font-weight: 900; line-height: 1.05; margin: 0; letter-spacing: -.5px; }
+  .p { font-size: 19px; line-height: 1.6; color: var(--muted); margin: 14px 0 0; }
+  .small { font-size: 16px; line-height: 1.55; color: var(--muted); margin: 6px 0 0; }
+  .b { font-weight: 900; color: var(--ink); font-size: 21px; margin: 0; }
+  .center { text-align: center; }
+  ul.dots { list-style: none; padding: 0; margin: 22px 0 0; }
+  ul.dots li { position: relative; padding-left: 30px; font-size: 19px; line-height: 1.55; color: var(--muted); margin-bottom: 14px; }
+  ul.dots li::before { content: ""; position: absolute; left: 0; top: 9px; width: 13px; height: 13px; border-radius: 50%; background: var(--y); }
 
-    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; }
-    .card { background: var(--panel); border-radius: 16px; padding: 2.2vh 2vw; border-top: 5px solid var(--accent); }
-    .card.good { border-top-color: var(--good); }
-    .card.bad { border-top-color: var(--bad); }
-    .card.warn { border-top-color: var(--warn); }
+  .photo { position: absolute; display: grid; place-items: center; color: var(--y); overflow: hidden;
+    background: radial-gradient(circle at 30% 25%, #555 0, #2f2f2f 45%, #1c1c1c 100%); }
+  .photo.gold { color: #fff; background: radial-gradient(circle at 30% 25%, #ffd34d 0, var(--y) 45%, var(--y2) 100%); }
+  .photo::after { content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0 2px, transparent 2px 14px); }
 
-    .title-slide { text-align: center; align-items: center; }
-    .title-slide .tag { color: var(--accent); letter-spacing: .2em; text-transform: uppercase; font-size: 1rem; }
-    .quote { border-left: 5px solid var(--accent); padding-left: 1.2em; font-style: italic; color: var(--muted); font-size: clamp(1.2rem, 2.4vw, 1.9rem); }
+  .card { position: absolute; background: #fff; border-radius: 18px; box-shadow: 0 18px 45px rgba(0,0,0,.10); }
+  .ycard { position: absolute; background: var(--y); border-radius: 20px; color: #fff; }
+  .tile { position: absolute; display: grid; place-items: center; border-radius: 16px; color: #fff; background: var(--y); }
+  .tile.dark { background: var(--dark); }
+  .num { font-weight: 900; font-size: 28px; color: var(--ink); }
 
-    .flow { display: flex; flex-wrap: wrap; gap: 1.2vw; align-items: center; margin-top: 2vh; }
-    .flow .step { background: var(--panel); padding: 1.2vh 1.4vw; border-radius: 12px; font-size: clamp(1rem, 1.8vw, 1.3rem); }
-    .flow .arrow { color: var(--accent); font-size: 1.8rem; }
+  .i { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8;
+    stroke-linecap: round; stroke-linejoin: round; display: block; }
 
-    .footer { position: absolute; bottom: 2.2vh; left: 8vw; right: 8vw; display: flex; justify-content: space-between;
-      color: var(--muted); font-size: .95rem; pointer-events: none; }
+  .pageno { position: absolute; left: 34px; bottom: 22px; font-size: 13px; letter-spacing: 2px; color: #9a9a9a; font-weight: 700; }
 
-    .controls { position: fixed; bottom: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; }
-    .controls button { background: var(--panel); color: var(--ink); border: 1px solid #1e2a47; border-radius: 10px;
-      padding: 8px 14px; font-size: 1rem; cursor: pointer; }
-    .controls button:hover { border-color: var(--accent); }
-    .progress { position: fixed; top: 0; left: 0; height: 4px; background: var(--accent); transition: width .3s; z-index: 10; }
+  .controls { position: fixed; bottom: 14px; right: 14px; display: flex; gap: 8px; z-index: 10; }
+  .controls button { background: #fff; color: #222; border: 0; border-radius: 10px; padding: 9px 15px;
+    font: 700 14px "Lato", Arial, sans-serif; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
+  .controls button:hover { background: var(--y); }
 
-    @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } .slide { padding: 5vh 6vw; } }
-    @media print {
-      html, body { overflow: visible; height: auto; }
-      .slide { display: flex !important; position: relative; height: 100vh; page-break-after: always; animation: none; }
-      .controls, .progress { display: none; }
-    }
-  </style>
+  @page { size: 1280px 720px; margin: 0; }
+  @media print {
+    html, body { overflow: visible; height: auto; background: #fff; }
+    .stage { position: static; transform: none; }
+    .slide { display: block !important; position: relative; width: 1280px; height: 720px; page-break-after: always; box-shadow: none; animation: none; }
+    .controls { display: none; }
+  }
+</style>
 </head>
 <body>
-<div class="progress" id="progress"></div>
 
-<main class="deck" id="deck">
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8"/><path d="M3 21h18"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></symbol>
+  <symbol id="i-game" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="10" rx="5"/><path d="M7 10v4M5 12h4"/><circle cx="16" cy="11" r=".6"/><circle cx="18" cy="13" r=".6"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-power" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-userx" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></symbol>
+  <symbol id="i-wifioff" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M6 21h12"/><path d="M3 7h18"/><path d="M6 7l-3 7a3 3 0 0 0 6 0z"/><path d="M18 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+  <symbol id="i-infinity" viewBox="0 0 24 24"><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4z"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></symbol>
+  <symbol id="i-mountain" viewBox="0 0 24 24"><path d="M8 4l4 8 4-4 6 12H2L8 4z"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+</svg>
+
+<div class="stage" id="stage">
 
   <!-- 1. Title -->
-  <section class="slide title-slide active">
-    <div class="tag">IICT Presentation</div>
-    <h1>The Internet Paradox:<br>A Blessing or a Curse?</h1>
-    <p class="sub">Exploring the positive and negative impact of the Internet on society</p>
+  <section class="slide active">
+    <div class="circ" style="left:110px;top:120px;width:560px;height:560px;background:var(--soft)"></div>
+    <div class="ring" style="left:-240px;top:-340px;width:640px;height:640px;border-width:74px"></div>
+    <div class="circ" style="right:90px;top:62px;width:120px;height:120px;background:var(--dark)"></div>
+    <div class="circ" style="right:66px;bottom:92px;width:62px;height:62px;background:var(--y)"></div>
+    <div class="abs" style="left:232px;top:222px">
+      <div style="font-size:46px;font-weight:400">The Internet</div>
+      <div style="font-size:124px;font-weight:900;line-height:1;letter-spacing:-3px">Paradox</div>
+      <div style="margin-top:64px;font-size:16px;letter-spacing:3px;color:#444;font-weight:700">A BLESSING OR A CURSE?</div>
+    </div>
+    <p class="p abs" style="left:800px;top:300px;width:370px;font-size:18px">IICT Presentation. Exploring how the Internet transformed civilization, and why its impact depends on how each of us chooses to use it.</p>
   </section>
 
-  <!-- 2. Names -->
+  <!-- 2. Presenters -->
   <section class="slide">
-    <h2>Presented By</h2>
-    <div class="cols">
-      <div class="card">
-        <h3>Turab Haider</h3>
-        <p class="sub">Roll No: [____]</p>
+    <div class="abs center" style="left:0;right:0;top:64px">
+      <p class="ov">Our Team</p>
+      <h2 class="t">Presented By</h2>
+    </div>
+    <div class="circ" style="left:255px;top:220px;width:130px;height:130px;background:#e2e2e2;display:grid;place-items:center;font-size:40px;font-weight:900;color:var(--dark)">TH</div>
+    <div class="circ" style="left:575px;top:220px;width:130px;height:130px;background:#e2e2e2;display:grid;place-items:center;font-size:60px;color:var(--dark)"><svg class="i"><use href="#i-user"/></svg></div>
+    <div class="circ" style="left:895px;top:220px;width:130px;height:130px;background:#e2e2e2;display:grid;place-items:center;font-size:60px;color:var(--dark)"><svg class="i"><use href="#i-user"/></svg></div>
+    <div class="ycard center" style="left:180px;top:380px;width:280px;height:150px;padding:30px 20px">
+      <div style="font-weight:900;font-size:26px">Turab Haider</div>
+      <div style="margin-top:10px;font-size:17px;color:#3a2a00">Roll No: [____]</div>
+    </div>
+    <div class="ycard center" style="left:500px;top:380px;width:280px;height:150px;padding:30px 20px">
+      <div style="font-weight:900;font-size:26px">[Member Name]</div>
+      <div style="margin-top:10px;font-size:17px;color:#3a2a00">Roll No: [____]</div>
+    </div>
+    <div class="ycard center" style="left:820px;top:380px;width:280px;height:150px;padding:30px 20px">
+      <div style="font-weight:900;font-size:26px">[Member Name]</div>
+      <div style="margin-top:10px;font-size:17px;color:#3a2a00">Roll No: [____]</div>
+    </div>
+    <p class="p abs center" style="left:0;right:0;top:580px">Subject: <b style="color:#222">[____]</b> &nbsp;&nbsp;|&nbsp;&nbsp; Teacher: <b style="color:#222">[____]</b></p>
+  </section>
+
+  <!-- 3. Contents -->
+  <section class="slide">
+    <div class="abs" style="left:150px;top:190px">
+      <div style="display:flex;align-items:center;gap:26px;margin-bottom:46px"><span class="circ" style="position:static;width:28px;height:28px;background:var(--y)"></span><span class="num">01</span><span style="font-size:30px">Introduction</span></div>
+      <div style="display:flex;align-items:center;gap:26px;margin-bottom:46px"><span class="circ" style="position:static;width:28px;height:28px;background:var(--y)"></span><span class="num">02</span><span style="font-size:30px">Positive Impact</span></div>
+      <div style="display:flex;align-items:center;gap:26px;margin-bottom:46px"><span class="circ" style="position:static;width:28px;height:28px;background:var(--y)"></span><span class="num">03</span><span style="font-size:30px">Negative Impact</span></div>
+      <div style="display:flex;align-items:center;gap:26px"><span class="circ" style="position:static;width:28px;height:28px;background:var(--y)"></span><span class="num">04</span><span style="font-size:30px">The Way Forward</span></div>
+    </div>
+    <div class="circ" style="left:740px;top:200px;width:420px;height:420px;background:var(--soft)"></div>
+    <div class="ring" style="left:800px;top:-160px;width:300px;height:300px;border-width:46px"></div>
+    <div class="abs center" style="left:740px;top:330px;width:420px">
+      <div style="font-size:54px;color:#444;display:flex;justify-content:center"><svg class="i"><use href="#i-list"/></svg></div>
+      <div style="font-size:44px;font-weight:900;margin-top:10px">Contents</div>
+      <div style="font-size:13px;letter-spacing:3px;color:#777;margin-top:8px;font-weight:700">PRESENTATION OUTLINE</div>
+    </div>
+  </section>
+
+  <!-- 4. Introduction -->
+  <section class="slide">
+    <div class="abs center" style="left:140px;right:140px;top:56px">
+      <p class="ov">Introduction</p>
+      <h2 class="t" style="font-size:48px">How the Internet Connected the World</h2>
+      <p class="p">Human civilization evolved from the Stone Age to the digital age. Each step changed how we share knowledge, and the Internet connected the entire world globally within seconds.</p>
+    </div>
+    <div class="abs" style="left:160px;right:160px;top:368px;height:2px;background:#d8d8d8"></div>
+    <div class="abs center" style="left:160px;top:330px;width:240px">
+      <div class="circ" style="position:relative;margin:0 auto;width:78px;height:78px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-mountain"/></svg></div>
+      <div class="num" style="margin-top:20px">01.</div><p class="b">Stone Age</p><p class="small">Knowledge passed on by speech and cave drawings.</p>
+    </div>
+    <div class="abs center" style="left:400px;top:330px;width:240px">
+      <div class="circ" style="position:relative;margin:0 auto;width:78px;height:78px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-pen"/></svg></div>
+      <div class="num" style="margin-top:20px">02.</div><p class="b">Writing &amp; Print</p><p class="small">Books carried ideas across generations.</p>
+    </div>
+    <div class="abs center" style="left:640px;top:330px;width:240px">
+      <div class="circ" style="position:relative;margin:0 auto;width:78px;height:78px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-phone"/></svg></div>
+      <div class="num" style="margin-top:20px">03.</div><p class="b">Telephone</p><p class="small">Voices crossed cities and countries.</p>
+    </div>
+    <div class="abs center" style="left:880px;top:330px;width:240px">
+      <div class="circ" style="position:relative;margin:0 auto;width:78px;height:78px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-globe"/></svg></div>
+      <div class="num" style="margin-top:20px">04.</div><p class="b">The Internet</p><p class="small">The whole world connected in seconds.</p>
+    </div>
+    <div class="abs" style="left:0;right:0;bottom:0;height:40px;background:var(--y)"></div>
+  </section>
+
+  <!-- 5. Double-edged sword -->
+  <section class="slide">
+    <div class="circ" style="left:64px;top:60px;width:26px;height:26px;background:var(--dark)"></div>
+    <div class="ring" style="left:-80px;top:560px;width:160px;height:160px;border-width:28px"></div>
+    <div class="abs" style="left:960px;top:0;width:320px;height:720px;background:var(--y)"></div>
+    <div class="photo" style="left:700px;top:190px;width:430px;height:320px;font-size:140px"><svg class="i"><use href="#i-scale"/></svg></div>
+    <div class="abs" style="left:130px;top:200px;width:500px">
+      <p class="ov">The Big Idea</p>
+      <h2 class="t">A Double-Edged Sword</h2>
+      <p class="p">The Internet is neither purely good nor purely bad. Whether it becomes a blessing or a curse depends on how each individual chooses to use it.</p>
+      <p class="p">Today we will examine both its positive and negative sides.</p>
+    </div>
+  </section>
+
+  <!-- 6. Positive section -->
+  <section class="slide">
+    <div class="abs" style="left:80px;top:0;width:470px;height:600px;background:var(--y);border-radius:0 0 60px 60px"></div>
+    <div class="circ" style="left:52px;top:110px;width:58px;height:58px;background:#fff"></div>
+    <div class="circ" style="left:520px;top:560px;width:58px;height:58px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.08)"></div>
+    <div class="abs" style="left:140px;top:230px;width:370px;color:#fff">
+      <p class="ov" style="color:#fff">Part 02</p>
+      <h2 class="t" style="font-size:66px">Positive Impact</h2>
+      <p class="p" style="color:#3a2a00">Access to information has never been easier. The Internet created new opportunities in education, business, and communication.</p>
+    </div>
+    <div class="abs" style="left:660px;top:160px;width:500px">
+      <p class="b" style="font-size:24px">Education</p><p class="small" style="margin-bottom:44px">Online classes, video lectures, and free study material.</p>
+      <p class="b" style="font-size:24px">Finance</p><p class="small" style="margin-bottom:44px">Banking and digital payments from anywhere.</p>
+      <p class="b" style="font-size:24px">Communication &amp; Entertainment</p><p class="small">Calls, games, and creative content for everyone.</p>
+    </div>
+  </section>
+
+  <!-- 7. Online learning -->
+  <section class="slide">
+    <div class="photo" style="left:0;top:0;width:400px;height:720px;font-size:150px"><svg class="i"><use href="#i-cap"/></svg></div>
+    <div class="card" style="left:300px;top:140px;width:520px;height:420px;padding:44px 46px;border-radius:4px">
+      <p class="b" style="font-size:25px">Learn From Anywhere</p>
+      <ul class="dots">
+        <li>Students learn anywhere through online courses and video lectures.</li>
+        <li>Free study material on YouTube, Khan Academy, and Coursera.</li>
+        <li>Online schooling kept education running during lockdowns.</li>
+      </ul>
+    </div>
+    <div class="abs" style="left:792px;top:532px;width:46px;height:46px;background:var(--y)"></div>
+    <div class="abs" style="left:880px;top:210px">
+      <p class="ov">Positive Impact</p>
+      <h2 class="t" style="font-size:66px">Online<br>Learning</h2>
+      <div style="font-size:90px;font-weight:900;line-height:1;margin-top:30px">&rdquo;</div>
+    </div>
+  </section>
+
+  <!-- 8. Banking -->
+  <section class="slide">
+    <div class="ring" style="left:1140px;top:-70px;width:190px;height:190px;border-width:32px"></div>
+    <div class="tile" style="left:120px;top:160px;width:180px;height:180px;flex-direction:column">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:62px"><svg class="i"><use href="#i-bank"/></svg></span><span style="font-weight:700;font-size:16px">Mobile Banking</span></div>
+    </div>
+    <div class="tile" style="left:120px;top:380px;width:180px;height:180px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px"><span style="font-size:62px"><svg class="i"><use href="#i-card"/></svg></span><span style="font-weight:700;font-size:16px">Digital Payments</span></div>
+    </div>
+    <div class="abs" style="left:380px;top:150px;width:760px">
+      <p class="ov">Positive Impact</p>
+      <h2 class="t" style="font-size:52px">Online Banking &amp; Digital Payments</h2>
+      <p class="p">Customers can transfer money, pay bills, and shop without visiting a bank.</p>
+    </div>
+    <div class="abs" style="left:380px;top:420px;width:330px"><p class="b">Mobile Banking</p><p class="small">Brings financial services to people in remote areas.</p></div>
+    <div class="abs" style="left:760px;top:420px;width:330px"><p class="b">Digital Payments</p><p class="small">Reduces the need to carry cash and makes shopping faster.</p></div>
+  </section>
+
+  <!-- 9. Calls -->
+  <section class="slide">
+    <div class="abs" style="left:0;top:0;width:150px;height:720px;background:var(--y)"></div>
+    <div class="circ" style="left:95px;top:305px;width:110px;height:110px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.12);display:grid;place-items:center;font-size:40px;color:var(--dark)"><svg class="i"><use href="#i-phone"/></svg></div>
+    <div class="abs" style="left:290px;top:170px;width:500px">
+      <p class="ov">Positive Impact</p>
+      <h2 class="t" style="font-size:50px">Internet Calls &amp; Communication</h2>
+      <ul class="dots">
+        <li>WhatsApp, Zoom, and Skype allow free or low-cost calls.</li>
+        <li>Families separated by distance stay connected easily.</li>
+        <li>Businesses hold meetings across countries in real time.</li>
+      </ul>
+    </div>
+    <div class="photo" style="left:870px;top:90px;width:330px;height:330px;font-size:120px"><svg class="i"><use href="#i-video"/></svg></div>
+    <div class="ring" style="left:1040px;top:560px;width:280px;height:280px;border-width:44px"></div>
+  </section>
+
+  <!-- 10. Games & study -->
+  <section class="slide">
+    <div class="abs center" style="left:0;right:0;top:48px">
+      <p class="ov">Positive Impact</p>
+      <h2 class="t" style="font-size:46px">Games, Entertainment &amp; Study Material</h2>
+    </div>
+    <div class="photo" style="left:90px;top:190px;width:360px;height:230px;font-size:100px"><svg class="i"><use href="#i-game"/></svg></div>
+    <div class="photo" style="left:460px;top:190px;width:360px;height:230px;font-size:100px"><svg class="i"><use href="#i-play"/></svg></div>
+    <div class="photo" style="left:830px;top:190px;width:360px;height:230px;font-size:100px"><svg class="i"><use href="#i-book"/></svg></div>
+    <div class="tile" style="left:120px;top:388px;width:64px;height:64px;border-radius:12px;font-weight:900;font-size:22px">01</div>
+    <div class="tile" style="left:490px;top:388px;width:64px;height:64px;border-radius:12px;font-weight:900;font-size:22px">02</div>
+    <div class="tile" style="left:860px;top:388px;width:64px;height:64px;border-radius:12px;font-weight:900;font-size:22px">03</div>
+    <div class="abs center" style="left:90px;top:480px;width:360px"><p class="b">Educational Games</p><p class="small">Help children learn while having fun.</p></div>
+    <div class="abs center" style="left:460px;top:480px;width:360px"><p class="b">Entertainment</p><p class="small">Creative content and media available to everyone.</p></div>
+    <div class="abs center" style="left:830px;top:480px;width:360px"><p class="b">Study Material</p><p class="small">Research papers, e-books, and tutorials online.</p></div>
+  </section>
+
+  <!-- 11. Negative section -->
+  <section class="slide">
+    <div class="circ" style="left:80px;top:56px;width:30px;height:30px;background:var(--y)"></div>
+    <div class="abs" style="left:120px;top:110px;width:600px">
+      <p class="ov">Part 03</p>
+      <h2 class="t" style="font-size:72px">Negative Impact</h2>
+      <p class="p">The same features that empower us can also harm us. Let us look at the main negative effects.</p>
+    </div>
+    <div class="circ" style="left:-150px;top:390px;width:720px;height:720px;background:var(--y)"></div>
+    <div class="abs" style="left:120px;top:500px;width:400px;color:#fff;font-weight:900;font-size:24px;line-height:1.7">
+      Cyberbullying<br>Distraction<br>Misinformation &amp; Privacy
+    </div>
+    <div class="photo circ" style="left:860px;top:-90px;width:440px;height:440px;font-size:110px;padding-top:80px"><svg class="i"><use href="#i-alert"/></svg></div>
+    <div class="photo circ" style="left:900px;top:400px;width:230px;height:230px;font-size:80px"><svg class="i"><use href="#i-eyeoff"/></svg></div>
+    <div class="circ" style="left:1170px;top:610px;width:26px;height:26px;background:var(--dark)"></div>
+  </section>
+
+  <!-- 12. Cyberbullying -->
+  <section class="slide">
+    <div class="abs" style="left:110px;top:200px;width:390px">
+      <p class="ov">Negative Impact</p>
+      <h2 class="t">Cyberbullying</h2>
+      <p class="p">Online harassment can seriously affect a victim's mental health and self-esteem.</p>
+    </div>
+    <div class="ycard" style="left:570px;top:140px;width:250px;height:440px;padding:34px 28px">
+      <div style="font-weight:900;font-size:30px">01.</div>
+      <div class="circ" style="position:relative;margin:26px 0;width:74px;height:74px;background:#fff;display:grid;place-items:center;font-size:32px;color:var(--dark)"><svg class="i"><use href="#i-clock"/></svg></div>
+      <div style="font-weight:900;font-size:23px">Anytime, Anywhere</div>
+      <p class="small" style="color:#3a2a00">Harassment follows victims home through their phones.</p>
+    </div>
+    <div class="ycard" style="left:850px;top:140px;width:250px;height:440px;padding:34px 28px">
+      <div style="font-weight:900;font-size:30px">02.</div>
+      <div class="circ" style="position:relative;margin:26px 0;width:74px;height:74px;background:#fff;display:grid;place-items:center;font-size:32px;color:var(--dark)"><svg class="i"><use href="#i-userx"/></svg></div>
+      <div style="font-weight:900;font-size:23px">Anonymous Abuse</div>
+      <p class="small" style="color:#3a2a00">Bullies hide behind fake accounts to threaten and humiliate.</p>
+    </div>
+    <div class="circ" style="left:1170px;top:600px;width:30px;height:30px;background:var(--dark)"></div>
+  </section>
+
+  <!-- 13. Distraction -->
+  <section class="slide">
+    <div class="ring" style="left:40px;top:40px;width:56px;height:56px;border-width:7px"></div>
+    <div class="circ" style="left:1200px;top:50px;width:26px;height:26px;background:var(--y)"></div>
+    <div class="abs center" style="left:0;right:0;top:56px">
+      <p class="ov">Negative Impact</p>
+      <h2 class="t" style="font-size:48px">Distraction &amp; Loss of Focus</h2>
+    </div>
+    <div class="photo gold" style="left:110px;top:200px;width:340px;height:170px;font-size:72px"><svg class="i"><use href="#i-bell"/></svg></div>
+    <div class="photo gold" style="left:470px;top:200px;width:340px;height:170px;font-size:72px"><svg class="i"><use href="#i-clock"/></svg></div>
+    <div class="photo gold" style="left:830px;top:200px;width:340px;height:170px;font-size:72px"><svg class="i"><use href="#i-power"/></svg></div>
+    <div class="abs" style="left:110px;top:396px;width:340px"><div class="num">01.</div><p class="b" style="margin-top:6px">Constant Notifications</p><p class="small">Social media alerts break concentration again and again.</p></div>
+    <div class="abs" style="left:470px;top:396px;width:340px"><div class="num">02.</div><p class="b" style="margin-top:6px">Excessive Screen Time</p><p class="small">Affects sleep, studies, and productivity.</p></div>
+    <div class="abs" style="left:830px;top:396px;width:340px"><div class="num">03.</div><p class="b" style="margin-top:6px">Hard to Switch Off</p><p class="small">Many people struggle to disconnect from the Internet.</p></div>
+    <div class="abs" style="left:110px;top:590px;width:340px;height:5px;background:var(--y)"></div>
+    <div class="abs" style="left:470px;top:590px;width:340px;height:5px;background:var(--y)"></div>
+    <div class="abs" style="left:830px;top:590px;width:340px;height:5px;background:var(--y)"></div>
+  </section>
+
+  <!-- 14. Misinformation & privacy -->
+  <section class="slide">
+    <div class="circ" style="left:-130px;top:500px;width:380px;height:380px;background:var(--y)"></div>
+    <div class="circ" style="left:1060px;top:470px;width:380px;height:380px;background:var(--y)"></div>
+    <div class="abs center" style="left:0;right:0;top:50px">
+      <p class="ov">Negative Impact</p>
+      <h2 class="t" style="font-size:48px">Misinformation &amp; Privacy Risks</h2>
+    </div>
+    <div class="card" style="left:130px;top:240px;width:1020px;height:290px;border-radius:24px"></div>
+    <div class="abs center" style="left:150px;top:200px;width:215px">
+      <div class="circ" style="position:relative;margin:0 auto;width:80px;height:80px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-alert"/></svg></div>
+      <p class="b" style="margin-top:34px">Fake News</p><p class="small">False news spreads faster than the truth on social media.</p>
+    </div>
+    <div class="abs center" style="left:405px;top:200px;width:215px">
+      <div class="circ" style="position:relative;margin:0 auto;width:80px;height:80px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-eyeoff"/></svg></div>
+      <p class="b" style="margin-top:34px">Data Misuse</p><p class="small">Personal data can be used for fraud or manipulation.</p>
+    </div>
+    <div class="abs center" style="left:660px;top:200px;width:215px">
+      <div class="circ" style="position:relative;margin:0 auto;width:80px;height:80px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-lock"/></svg></div>
+      <p class="b" style="margin-top:34px">Phishing Scams</p><p class="small">Fake links and hacking put people's money at risk.</p>
+    </div>
+    <div class="abs center" style="left:915px;top:200px;width:215px">
+      <div class="circ" style="position:relative;margin:0 auto;width:80px;height:80px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:34px"><svg class="i"><use href="#i-heart"/></svg></div>
+      <p class="b" style="margin-top:34px">Mental Health</p><p class="small">Comparison and screen time can harm self-worth and sleep.</p>
+    </div>
+  </section>
+
+  <!-- 15. Why the paradox exists -->
+  <section class="slide">
+    <div class="circ" style="left:60px;top:40px;width:240px;height:240px;background:var(--soft)"></div>
+    <div class="circ" style="left:70px;top:58px;width:22px;height:22px;background:var(--y)"></div>
+    <div class="abs" style="left:110px;top:120px;width:580px">
+      <p class="ov">Understanding the Problem</p>
+      <h2 class="t">Why the Paradox Exists</h2>
+    </div>
+    <p class="small abs" style="left:780px;top:140px;width:390px;font-size:18px">The Internet amplifies everything, good and bad. Four forces explain why the same tool can help or harm.</p>
+    <div class="tile" style="left:110px;top:330px;width:120px;height:120px;font-size:50px"><svg class="i"><use href="#i-zap"/></svg></div>
+    <div class="tile dark" style="left:385px;top:330px;width:120px;height:120px;font-size:50px"><svg class="i"><use href="#i-dollar"/></svg></div>
+    <div class="tile" style="left:660px;top:330px;width:120px;height:120px;font-size:50px"><svg class="i"><use href="#i-userx"/></svg></div>
+    <div class="tile dark" style="left:935px;top:330px;width:120px;height:120px;font-size:50px"><svg class="i"><use href="#i-file"/></svg></div>
+    <div class="abs" style="left:110px;top:480px;width:240px"><p class="b">Scale &amp; Speed</p><p class="small">Good and bad content reaches millions in moments.</p></div>
+    <div class="abs" style="left:385px;top:480px;width:240px"><p class="b">Business Models</p><p class="small">Platforms reward attention, and outrage holds attention.</p></div>
+    <div class="abs" style="left:660px;top:480px;width:240px"><p class="b">Anonymity</p><p class="small">Protects whistleblowers, but also shields abusers.</p></div>
+    <div class="abs" style="left:935px;top:480px;width:240px"><p class="b">Lagging Rules</p><p class="small">Technology moves faster than laws and digital skills.</p></div>
+  </section>
+
+  <!-- 16. Digital divide -->
+  <section class="slide">
+    <div class="photo" style="left:100px;top:170px;width:520px;height:330px;border:14px solid #222;border-radius:16px;font-size:120px"><svg class="i"><use href="#i-wifioff"/></svg></div>
+    <div class="abs" style="left:60px;top:498px;width:600px;height:22px;background:#9c9c9c;border-radius:0 0 18px 18px"></div>
+    <div class="tile" style="left:570px;top:360px;width:96px;height:96px;font-size:44px;box-shadow:0 10px 24px rgba(0,0,0,.18)"><svg class="i"><use href="#i-users"/></svg></div>
+    <div class="abs" style="left:740px;top:150px;width:440px">
+      <p class="ov">Negative Impact</p>
+      <h2 class="t" style="font-size:54px">The Digital Divide</h2>
+      <div style="display:flex;gap:16px;margin-top:30px"><span class="circ" style="position:static;flex:none;width:18px;height:18px;background:var(--y);margin-top:6px"></span><div><p class="b">01. Access</p><p class="small">People without connectivity or devices miss out on online learning and services.</p></div></div>
+      <div style="display:flex;gap:16px;margin-top:22px"><span class="circ" style="position:static;flex:none;width:18px;height:18px;background:var(--y);margin-top:6px"></span><div><p class="b">02. Skills</p><p class="small">Those without digital literacy are more exposed to scams and misinformation.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 17. Attention economy -->
+  <section class="slide">
+    <div class="circ" style="left:1150px;top:60px;width:50px;height:50px;background:var(--dark)"></div>
+    <div class="ycard" style="left:90px;top:120px;width:530px;height:480px;padding:60px 50px;border-radius:28px">
+      <p class="ov" style="color:#fff">Negative Impact</p>
+      <h2 class="t" style="font-size:54px">The Attention Economy</h2>
+      <p class="p" style="color:#3a2a00">Many apps are designed to keep us scrolling, not to help us finish what we came to do.</p>
+    </div>
+    <div class="circ" style="left:604px;top:590px;width:14px;height:14px;background:var(--dark)"></div>
+    <div class="circ" style="left:790px;top:120px;width:300px;height:300px;border:26px solid #e4e4e4"></div>
+    <div class="circ" style="left:790px;top:120px;width:300px;height:300px;border:26px solid var(--y);border-left-color:transparent;transform:rotate(-45deg)"></div>
+    <div class="abs" style="left:790px;top:120px;width:300px;height:300px;display:grid;place-items:center;font-size:100px;color:var(--dark)"><svg class="i"><use href="#i-infinity"/></svg></div>
+    <div class="abs center" style="left:720px;top:450px;width:440px">
+      <p class="b" style="font-size:24px">Endless Scroll</p>
+      <p class="small">Infinite feeds, autoplay, and push notifications pull attention away from study and sleep, and constant task switching makes deep work harder.</p>
+    </div>
+  </section>
+
+  <!-- 18. Who can act -->
+  <section class="slide">
+    <div class="circ" style="left:-110px;top:460px;width:430px;height:430px;background:var(--y)"></div>
+    <div class="ring" style="left:1110px;top:-70px;width:180px;height:180px;border-width:28px"></div>
+    <div class="card" style="left:110px;top:170px;width:420px;height:350px;padding:50px 44px">
+      <p class="ov">The Way Forward</p>
+      <h2 class="t" style="font-size:44px">Balancing the Scales</h2>
+      <p class="p">Everyone has a role in making the Internet a better place.</p>
+    </div>
+    <div class="abs" style="left:620px;top:120px;width:560px">
+      <div style="display:flex;gap:20px;padding:20px 24px">
+        <span style="font-size:30px;color:var(--y);flex:none"><svg class="i"><use href="#i-user"/></svg></span>
+        <div><p class="b">Individuals</p><p class="small">Digital literacy, critical thinking, privacy settings, and healthy habits.</p></div>
       </div>
-      <div class="card">
-        <h3>[Group member name]</h3>
-        <p class="sub">Roll No: [____]</p>
+      <div style="display:flex;gap:20px;padding:20px 24px;background:var(--y);border-radius:16px;color:#fff">
+        <span style="font-size:30px;flex:none"><svg class="i"><use href="#i-cap"/></svg></span>
+        <div><p class="b" style="color:#fff">Schools &amp; Companies</p><p class="small" style="color:#3a2a00">Media literacy in classes, and products designed for well-being.</p></div>
       </div>
-      <div class="card">
-        <h3>Subject: [____]</h3>
+      <div style="display:flex;gap:20px;padding:20px 24px">
+        <span style="font-size:30px;color:var(--y);flex:none"><svg class="i"><use href="#i-bank"/></svg></span>
+        <div><p class="b">Governments</p><p class="small">Sensible data-protection and cybercrime laws, balanced with free expression.</p></div>
       </div>
-      <div class="card">
-        <h3>Teacher: [____]</h3>
+      <div style="display:flex;gap:20px;padding:20px 24px">
+        <span style="font-size:30px;color:var(--y);flex:none"><svg class="i"><use href="#i-globe"/></svg></span>
+        <div><p class="b">Global Cooperation</p><p class="small">Cross-border work, because the Internet has no borders.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 3. Introduction -->
+  <!-- 19. How to use the Internet well -->
   <section class="slide">
-    <h2>Introduction</h2>
-    <p>Human civilization has moved from the Stone Age to the digital age, and each shift changed how people share knowledge.</p>
-    <div class="flow">
-      <div class="step">Stone Age: spoken word</div><div class="arrow">→</div>
-      <div class="step">Writing and print</div><div class="arrow">→</div>
-      <div class="step">Telegraph and telephone</div><div class="arrow">→</div>
-      <div class="step">The Internet</div>
+    <div class="ring" style="left:1010px;top:470px;width:360px;height:360px;border-width:58px"></div>
+    <div class="circ" style="left:1170px;top:70px;width:40px;height:40px;background:var(--dark)"></div>
+    <div class="abs" style="left:110px;top:80px;width:820px">
+      <p class="ov">The Way Forward</p>
+      <h2 class="t" style="font-size:48px">How We Can Use the Internet to Our Advantage</h2>
     </div>
-    <p style="margin-top:3vh">The Internet has connected the entire world globally, making information and people reachable within seconds.</p>
-  </section>
-
-  <!-- 4. Dual nature -->
-  <section class="slide">
-    <h2>A Double-Edged Sword</h2>
-    <p class="quote">The Internet is a powerful tool. Whether it becomes a blessing or a curse depends on how each individual uses it.</p>
-    <p style="margin-top:4vh">Today we will examine both its positive and negative impacts.</p>
-  </section>
-
-  <!-- 5. Positive overview -->
-  <section class="slide">
-    <h2>Positive Impact: Overview</h2>
-    <ul>
-      <li>Access to information has never been easier.</li>
-      <li>It has created opportunities in education, business, and communication.</li>
-      <li>Let us look at the major areas of benefit.</li>
-    </ul>
-  </section>
-
-  <!-- 6. Online learning -->
-  <section class="slide">
-    <h2>Positive Impact: Online Learning &amp; Schooling</h2>
-    <ul>
-      <li>Students can learn from anywhere through online courses and video lectures.</li>
-      <li>Free study material is available on platforms such as YouTube, Khan Academy, and Coursera.</li>
-      <li>Online schooling kept education running during lockdowns.</li>
-    </ul>
-  </section>
-
-  <!-- 7. Banking -->
-  <section class="slide">
-    <h2>Positive Impact: Online Banking &amp; Digital Payments</h2>
-    <ul>
-      <li>Customers can transfer money, pay bills, and shop without visiting a bank.</li>
-      <li>Mobile banking brings financial services to remote areas.</li>
-      <li>Digital payments reduce the need to carry cash.</li>
-    </ul>
-  </section>
-
-  <!-- 8. Calls & communication -->
-  <section class="slide">
-    <h2>Positive Impact: Internet Calls &amp; Communication</h2>
-    <ul>
-      <li>Apps like WhatsApp, Zoom, and Skype allow free or low-cost calls.</li>
-      <li>Families separated by distance can stay connected easily.</li>
-      <li>Businesses can hold meetings across countries in real time.</li>
-    </ul>
-  </section>
-
-  <!-- 9. Games & study -->
-  <section class="slide">
-    <h2>Positive Impact: Games, Entertainment &amp; Study Material</h2>
-    <ul>
-      <li>Educational games help children learn while having fun.</li>
-      <li>Entertainment and creative content are available to everyone.</li>
-      <li>Students can access research papers, e-books, and tutorials.</li>
-    </ul>
-  </section>
-
-  <!-- 10. Negative overview -->
-  <section class="slide">
-    <h2>Negative Impact: Overview</h2>
-    <p class="quote">The same features that empower us can also harm us.</p>
-    <p style="margin-top:3vh">Let us look at the main negative effects.</p>
-  </section>
-
-  <!-- 11. Cyberbullying -->
-  <section class="slide">
-    <h2>Negative Impact: Cyberbullying</h2>
-    <ul>
-      <li>Online harassment can happen anytime and anywhere.</li>
-      <li>Victims may face anonymous abuse, threats, and humiliation.</li>
-      <li>It can seriously affect mental health and self-esteem.</li>
-    </ul>
-  </section>
-
-  <!-- 12. Distraction -->
-  <section class="slide">
-    <h2>Negative Impact: Distraction &amp; Loss of Focus</h2>
-    <ul>
-      <li>Constant notifications and social media reduce concentration.</li>
-      <li>Excessive screen time affects sleep, studies, and productivity.</li>
-      <li>Many people struggle to switch off from the Internet.</li>
-    </ul>
-  </section>
-
-  <!-- 13. Misinfo & privacy -->
-  <section class="slide">
-    <h2>Negative Impact: Misinformation &amp; Privacy</h2>
-    <div class="cols">
-      <div class="card bad"><h3>Misinformation</h3><p>False news spreads faster than the truth on social media.</p></div>
-      <div class="card bad"><h3>Privacy Risks</h3><p>Personal data can be misused for fraud or targeted manipulation.</p></div>
-      <div class="card bad"><h3>Scams</h3><p>Phishing and hacking put individuals at financial risk.</p></div>
-      <div class="card bad"><h3>Mental Health</h3><p>Constant comparison and screen time can harm self-worth and sleep.</p></div>
+    <div class="abs" style="left:110px;top:280px;width:460px">
+      <div style="display:flex;gap:20px;margin-bottom:30px"><span class="circ" style="position:static;flex:none;width:54px;height:54px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:26px"><svg class="i"><use href="#i-search"/></svg></span><div><p class="b">Verify Before Sharing</p><p class="small">Check sources before forwarding any news.</p></div></div>
+      <div style="display:flex;gap:20px;margin-bottom:30px"><span class="circ" style="position:static;flex:none;width:54px;height:54px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:26px"><svg class="i"><use href="#i-book"/></svg></span><div><p class="b">Learn and Grow</p><p class="small">Use it for learning, skill-building, and positive connections.</p></div></div>
+      <div style="display:flex;gap:20px"><span class="circ" style="position:static;flex:none;width:54px;height:54px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:26px"><svg class="i"><use href="#i-clock"/></svg></span><div><p class="b">Set Healthy Limits</p><p class="small">Control screen time and notifications.</p></div></div>
+    </div>
+    <div class="abs" style="left:620px;top:280px;width:400px">
+      <div style="display:flex;gap:20px;margin-bottom:30px"><span class="circ" style="position:static;flex:none;width:54px;height:54px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:26px"><svg class="i"><use href="#i-shield"/></svg></span><div><p class="b">Protect Your Data</p><p class="small">Use strong passwords and privacy settings.</p></div></div>
+      <div style="display:flex;gap:20px"><span class="circ" style="position:static;flex:none;width:54px;height:54px;background:var(--y);display:grid;place-items:center;color:#fff;font-size:26px"><svg class="i"><use href="#i-msg"/></svg></span><div><p class="b">Stand Up to Bullying</p><p class="small">Report cyberbullying and support those who face it.</p></div></div>
     </div>
   </section>
 
-  <!-- 14a. Why the paradox exists -->
+  <!-- 20. Conclusion -->
   <section class="slide">
-    <h2>Why the Paradox Exists</h2>
-    <ul>
-      <li><strong>Scale and speed:</strong> whatever the Internet amplifies, good or bad, reaches millions in moments.</li>
-      <li><strong>Engagement-driven business models:</strong> platforms often reward attention, and outrage holds attention.</li>
-      <li><strong>Anonymity:</strong> it protects dissidents and whistleblowers, but it also shields abusers.</li>
-      <li><strong>Lagging rules and skills:</strong> technology moves faster than regulation and digital literacy.</li>
-    </ul>
-  </section>
-
-  <!-- 14b. Digital divide -->
-  <section class="slide">
-    <h2>Negative Impact: The Digital Divide</h2>
-    <div class="cols">
-      <div class="card warn"><h3>Access</h3><p>People without reliable connectivity or devices miss out on online learning and services.</p></div>
-      <div class="card warn"><h3>Skills</h3><p>Those without digital literacy are more exposed to scams and misinformation.</p></div>
+    <div class="abs" style="left:110px;top:150px;width:560px">
+      <p class="ov">Conclusion</p>
+      <h2 class="t" style="font-size:54px">Neither a Blessing Nor a Curse</h2>
+      <ul class="dots">
+        <li>The Internet is a powerful tool, not purely good or bad.</li>
+        <li>Its impact depends on human choices, awareness, and responsibility.</li>
+        <li>Used wisely, it can build a better, more connected world.</li>
+      </ul>
     </div>
-    <p style="margin-top:3vh">The benefits of the Internet are unevenly shared, which can widen existing gaps in education and income.</p>
-  </section>
-
-  <!-- 14c. Attention economy -->
-  <section class="slide">
-    <h2>Negative Impact: The Attention Economy</h2>
-    <p class="quote">Many apps are designed to keep us scrolling, not to help us finish what we came to do.</p>
-    <ul style="margin-top:3vh">
-      <li>Infinite feeds, autoplay, and push notifications pull attention away from study and sleep.</li>
-      <li>Frequent task switching makes deep, focused work harder.</li>
-    </ul>
-  </section>
-
-  <!-- 14d. Solutions by stakeholder -->
-  <section class="slide">
-    <h2>Balancing the Scales: Who Can Act?</h2>
-    <div class="cols">
-      <div class="card good"><h3>Individuals</h3><p>Digital literacy, critical thinking, privacy settings, and healthy usage habits.</p></div>
-      <div class="card good"><h3>Schools &amp; Companies</h3><p>Media literacy in the curriculum, and products designed for user well-being.</p></div>
-      <div class="card good"><h3>Governments</h3><p>Sensible rules on data protection and cybercrime, balanced with free expression.</p></div>
-      <div class="card good"><h3>Global Cooperation</h3><p>Cross-border work, because the Internet does not respect national borders.</p></div>
+    <div class="ycard" style="left:760px;top:150px;width:410px;height:420px;padding:40px 44px;border-radius:26px">
+      <div style="font-size:110px;font-weight:900;line-height:.8">&ldquo;</div>
+      <div style="font-size:29px;font-weight:900;line-height:1.35;color:#2b2000;margin-top:10px">The Internet did not decide what kind of world we would build with it. We do.</div>
     </div>
+    <div class="circ" style="left:1146px;top:118px;width:54px;height:54px;background:var(--dark)"></div>
+    <div class="circ" style="left:740px;top:550px;width:40px;height:40px;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.1)"></div>
   </section>
 
-  <!-- 14. How to use for good -->
+  <!-- 21. Thank you -->
   <section class="slide">
-    <h2>How We Can Use the Internet to Our Advantage</h2>
-    <ul>
-      <li>Verify information before sharing it.</li>
-      <li>Use the Internet for learning, skill-building, and positive connections.</li>
-      <li>Set healthy limits on screen time.</li>
-      <li>Protect personal data with strong passwords and privacy settings.</li>
-      <li>Report cyberbullying and support others who face it.</li>
-    </ul>
+    <div class="circ" style="left:110px;top:120px;width:560px;height:560px;background:var(--soft)"></div>
+    <div class="ring" style="left:-240px;top:-340px;width:640px;height:640px;border-width:74px"></div>
+    <div class="circ" style="right:90px;top:62px;width:120px;height:120px;background:var(--dark)"></div>
+    <div class="circ" style="right:66px;bottom:92px;width:62px;height:62px;background:var(--y)"></div>
+    <div class="abs" style="left:232px;top:250px">
+      <div style="font-size:46px;font-weight:400">The end</div>
+      <div style="font-size:124px;font-weight:900;line-height:1;letter-spacing:-3px">Thanks</div>
+      <div style="margin-top:64px;font-size:16px;letter-spacing:3px;color:#444;font-weight:700">THE INTERNET PARADOX</div>
+    </div>
+    <p class="p abs" style="left:880px;top:320px;width:300px;font-size:20px">Thank you for your attention. Questions are welcome.</p>
   </section>
 
-  <!-- 15. Conclusion -->
-  <section class="slide">
-    <h2>Conclusion</h2>
-    <ul>
-      <li>The Internet is a powerful tool, neither a pure blessing nor a pure curse.</li>
-      <li>Its impact depends on human choices, awareness, and responsibility.</li>
-      <li>Used wisely, it can help build a better and more connected world.</li>
-    </ul>
-    <p class="quote" style="margin-top:4vh">The Internet did not decide what kind of world we would build with it. We do.</p>
-  </section>
-
-  <!-- 16. Thank you -->
-  <section class="slide title-slide">
-    <h1>Thank You</h1>
-    <p class="sub">Questions are welcome</p>
-  </section>
-
-</main>
+</div>
 
 <div class="controls">
-  <button id="prev" aria-label="Previous slide">← Prev</button>
-  <button id="next" aria-label="Next slide">Next →</button>
+  <button id="prev" aria-label="Previous slide">&larr; Prev</button>
+  <button id="next" aria-label="Next slide">Next &rarr;</button>
 </div>
 
 <script>
-  (function () {
-    const slides = Array.from(document.querySelectorAll('.slide'));
-    const progress = document.getElementById('progress');
-    let index = 0;
+(function () {
+  const stage = document.getElementById('stage');
+  const slides = Array.from(stage.querySelectorAll('.slide'));
+  let index = 0;
 
-    function show(i) {
-      index = Math.max(0, Math.min(slides.length - 1, i));
-      slides.forEach((s, n) => s.classList.toggle('active', n === index));
-      progress.style.width = ((index + 1) / slides.length * 100) + '%';
-      history.replaceState(null, '', '#' + (index + 1));
-    }
+  slides.forEach((s, n) => {
+    if (n === 0 || n === slides.length - 1) return;
+    const tag = document.createElement('div');
+    tag.className = 'pageno';
+    tag.textContent = String(n + 1).padStart(2, '0') + ' / ' + slides.length;
+    s.appendChild(tag);
+  });
 
-    document.getElementById('prev').onclick = () => show(index - 1);
-    document.getElementById('next').onclick = () => show(index + 1);
+  function fit() {
+    const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+    stage.style.setProperty('--s', s);
+  }
+  window.addEventListener('resize', fit);
+  fit();
 
-    document.addEventListener('keydown', e => {
-      if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(index + 1); }
-      if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(index - 1); }
-      if (e.key === 'Home') show(0);
-      if (e.key === 'End') show(slides.length - 1);
-    });
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, n) => s.classList.toggle('active', n === index));
+    history.replaceState(null, '', '#' + (index + 1));
+  }
 
-    let startX = null;
-    document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-    document.addEventListener('touchend', e => {
-      if (startX === null) return;
-      const dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
-      startX = null;
-    });
+  document.getElementById('prev').onclick = () => show(index - 1);
+  document.getElementById('next').onclick = () => show(index + 1);
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(index + 1); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(index - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+    if (e.key === 'f') document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  });
 
-    const fromHash = parseInt(location.hash.slice(1), 10);
-    show(isNaN(fromHash) ? 0 : fromHash - 1);
-  })();
+  let startX = null;
+  document.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
+    startX = null;
+  });
+
+  const fromHash = parseInt(location.hash.slice(1), 10);
+  show(isNaN(fromHash) ? 0 : fromHash - 1);
+})();
 </script>
 </body>
 </html>
